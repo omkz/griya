@@ -4,12 +4,10 @@ class PagesController < ApplicationController
   before_action :resume_session, only: [:home]
 
   def home
-    # Fetch the 3 latest active properties to show on home
-    # @featured_properties = Property.active.limit(3).order(created_at: :desc)
-
-    @featured_properties = Property.where(status: :active).limit(6)
-   
+    @featured_properties = Property.where(featured: true).where(status: :active).limit(4)
+    @latest_properties = Property.where(status: :active).order(created_at: :desc).limit(6)
   end
+
 
 
 end

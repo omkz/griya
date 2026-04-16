@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_16_090759) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_16_122706) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -64,6 +64,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_16_090759) do
     t.datetime "created_at", null: false
     t.string "currency", limit: 3, default: "IDR"
     t.text "description"
+    t.boolean "featured", default: false
     t.integer "floors", default: 1
     t.integer "listing_type", default: 0
     t.geography "lonlat", limit: {srid: 4326, type: "st_point", geographic: true}, null: false
@@ -76,6 +77,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_16_090759) do
     t.string "title", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id"
+    t.integer "views_count", default: 0
     t.index ["account_id"], name: "index_properties_on_account_id"
     t.index ["listing_type"], name: "index_properties_on_listing_type"
     t.index ["lonlat"], name: "index_properties_on_lonlat", using: :gist
