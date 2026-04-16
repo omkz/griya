@@ -1,0 +1,118 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div>
+      <h1 class="text-3xl font-black text-gray-900">Cari Properti</h1>
+      <p class="text-gray-500">Menampilkan <%= @properties.count %> properti yang tersedia</p>
+    </div>
+    
+    <div class="flex gap-2">
+      <!-- Sort or View Switch could go here -->
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+    <!-- Sidebar Filters -->
+    <div class="lg:col-span-1">
+      <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm sticky top-24">
+        <h3 class="font-bold text-gray-900 mb-6 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+          </svg>
+          Filter Pencarian
+        </h3>
+
+        <%= form_with url: properties_path, method: :get, class: "space-y-6" do |f| %>
+          <!-- Keyword -->
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Kata Kunci</label>
+            <%= f.text_field :query, value: params[:query], placeholder: "Cari judul...", class: "w-full rounded-xl border-gray-200 text-sm focus:ring-blue-500 focus:border-blue-500" %>
+          </div>
+
+          <!-- Listing Type -->
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Status Listing</label>
+            <div class="flex flex-col gap-2">
+              <% [["Semua", ""], ["Dijual", "for_sale"], ["Disewa", "for_rent"]].each do |label, value| %>
+                <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer hover:text-blue-600 transition">
+                  <%= f.radio_button :listing_type, value, checked: params[:listing_type] == value, class: "text-blue-600 focus:ring-blue-500 border-gray-300" %>
+                  <%= label %>
+                </label>
+              <% end %>
+            </div>
+          </div>
+
+          <!-- Property Type -->
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Tipe Properti</label>
+            <%= f.select :type, [["Semua Tipe", ""]] + @property_types.map { |t| [t.humanize, t] }, { selected: params[:type] }, class: "w-full rounded-xl border-gray-200 text-sm focus:ring-blue-500 focus:border-blue-500" %>
+          </div>
+
+          <!-- Region -->
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Wilayah</label>
+            <%= f.select :region_id, [["Semua Wilayah", ""]] + @regions.map { |r| [r.name, r.id] }, { selected: params[:region_id] }, class: "w-full rounded-xl border-gray-200 text-sm focus:ring-blue-500 focus:border-blue-500" %>
+          </div>
+
+          <%= f.submit "Terapkan Filter", class: "w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-blue-200" %>
+          
+          <% if params.slice(:query, :type, :listing_type, :region_id).values.any?(&:present?) %>
+            <%= link_to "Reset Semua", properties_path, class: "block text-center text-sm text-gray-400 hover:text-gray-600 font-medium underline mt-2" %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Results Grid -->
+    <div class="lg:col-span-3">
+      <% if @properties.any? %>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <% @properties.each do |property| %>
+            <%= link_to property_path(property), class: "group bg-white border border-gray-100 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300" do %>
+              <div class="relative h-56 bg-gray-200 overflow-hidden text-balance">
+                <% if property.images.attached? %>
+                  <%= image_tag property.images.first, class: "w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" %>
+                <% else %>
+                  <div class="w-full h-full flex items-center justify-center text-gray-400 font-bold bg-gray-100">NO IMAGE</div>
+                <% end %>
+                <div class="absolute top-4 left-4">
+                  <span class="bg-white/95 backdrop-blur px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-blue-600 shadow-sm">
+                    <%= property.listing_type.humanize %>
+                  </span>
+                </div>
+                <% if property.featured? %>
+                  <div class="absolute top-4 right-4">
+                    <span class="bg-blue-600 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">Featured</span>
+                  </div>
+                <% end %>
+              </div>
+              <div class="p-5">
+                <h3 class="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition truncate mb-1"><%= property.title %></h3>
+                <p class="text-xs text-gray-500 flex items-center gap-1 mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  </svg>
+                  <%= property.region.name %>
+                </p>
+                <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-50">
+                  <p class="text-xl font-black text-blue-600">
+                    <%= number_to_currency(property.price, unit: "Rp ", delimiter: ".", precision: 0) %>
+                  </p>
+                  <span class="text-[10px] font-black text-gray-400 uppercase tracking-tighter"><%= property.property_type.humanize %></span>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="bg-gray-50 py-32 text-center rounded-3xl border-2 border-dashed border-gray-200">
+          <div class="mx-auto w-20 h-20 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm">
+             🔍
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Tidak Menemukan Apapun</h3>
+          <p class="text-gray-500 max-w-xs mx-auto">Kami tidak dapat menemukan properti yang sesuai dengan filter Anda. Coba ubah kata kunci atau filter lainnya.</p>
+          <%= link_to "Reset Pencarian", properties_path, class: "mt-8 inline-block bg-blue-600 text-white font-bold px-8 py-3 rounded-xl hover:bg-blue-700 transition" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
