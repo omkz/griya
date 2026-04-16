@@ -3,4 +3,10 @@ class User < ApplicationRecord
   has_many :sessions, dependent: :destroy
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
+
+  belongs_to :account
+  has_many :properties, dependent: :destroy
+
+  # Roles for your SaaS logic
+  enum :role, { customer: 0, agent: 1, admin: 2 }
 end

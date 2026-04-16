@@ -23,9 +23,17 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <main class="container mx-auto mt-28 px-5 flex">
+  <body class="bg-gray-50 text-gray-900 antialiased font-sans">
+    <%= render "shared/navbar" %>
+
+    <div id="flash" class="fixed top-5 right-5 z-50">
+      <%= render "shared/flash" %>
+    </div>
+
+    <main class="min-h-screen">
       <%= yield %>
     </main>
+
+    <%= render "shared/footer" %>
   </body>
 </html>
