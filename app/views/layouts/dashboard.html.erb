@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Dashboard - Griya Jogja</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="bg-gray-50 text-gray-900 antialiased font-sans">
+    <div class="flex min-h-screen">
+      <!-- Sidebar -->
+      <aside class="w-64 bg-white border-r border-gray-100 hidden lg:flex flex-col sticky top-0 h-screen">
+        <div class="h-16 flex items-center px-8 border-b border-gray-50">
+          <%= link_to root_path, class: "flex items-center gap-2" do %>
+            <span class="text-xl font-black text-blue-600 tracking-tighter">GRIYA <span class="text-gray-400 font-normal">PRO</span></span>
+          <% end %>
+        </div>
+
+        <nav class="flex-grow p-6 space-y-2">
+          <%= link_to dashboard_properties_path, class: "flex items-center gap-3 px-4 py-3 rounded-2xl #{controller_name == 'properties' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'} transition font-bold" do %>
+            🏠 <span class="text-sm">Properti Saya</span>
+          <% end %>
+          
+          <div class="pt-6 pb-2 px-4 text-[10px] font-black text-gray-300 uppercase tracking-widest">Akun</div>
+          
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-gray-400 hover:bg-gray-50 hover:text-gray-900 transition font-bold cursor-not-allowed">
+            👤 <span class="text-sm">Profil (Soon)</span>
+          </a>
+        </nav>
+
+        <div class="p-6 border-t border-gray-50">
+          <div class="bg-gray-50 rounded-2xl p-4">
+            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Login Sebagai</p>
+            <p class="text-sm font-bold truncate"><%= Current.user.email_address %></p>
+            <p class="text-[10px] bg-blue-100 text-blue-600 px-1 inline-block rounded font-bold uppercase mt-1"><%= Current.user.role.humanize %></p>
+          </div>
+          <%= button_to "Sign Out", session_path, method: :delete, class: "w-full mt-4 text-xs font-bold text-red-500 hover:text-red-700 transition px-4 text-left" %>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <div class="flex-grow flex flex-col">
+        <!-- Top Nav (Mobile) -->
+        <header class="lg:hidden h-16 bg-white border-b border-gray-100 flex items-center justify-between px-6">
+           <span class="text-lg font-black text-blue-600">GRIYA</span>
+           <%= link_to "Menu", "#", class: "text-sm font-bold text-gray-500" %>
+        </header>
+
+        <main class="flex-grow">
+          <!-- Flash messages -->
+          <div id="flash" class="max-w-7xl mx-auto px-4 mt-4">
+            <%= render "shared/flash" %>
+          </div>
+          
+          <%= yield %>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

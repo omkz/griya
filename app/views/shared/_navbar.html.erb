@@ -8,16 +8,16 @@
 
         <div class="hidden sm:ml-8 sm:flex sm:space-x-8">
           <%= link_to "Find Home", properties_path, class: "text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium" %>
-          <% if authenticated? && current_user.agent? %>
-            <%= link_to "My Dashboard", dashboard_path, class: "text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium" %>
+          <% if authenticated? && (Current.user.agent? || Current.user.admin?) %>
+            <%= link_to "Dashboard", dashboard_root_path, class: "text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium" %>
           <% end %>
         </div>
       </div>
 
       <div class="flex items-center gap-4">
         <% if authenticated? %>
-          <span class="text-sm text-gray-500"><%= current_user.full_name %></span>
-          <%= button_to "Sign Out", destroy_user_session_path, method: :delete, class: "text-sm text-red-600 font-medium" %>
+          <span class="text-sm text-gray-500 font-medium"><%= Current.user.email_address.split('@').first.capitalize %></span>
+          <%= button_to "Sign Out", session_path, method: :delete, class: "text-xs px-3 py-1 bg-gray-100 text-gray-500 rounded-full hover:bg-red-50 hover:text-red-600 transition" %>
         <% else %>
           <%= link_to "Sign In", new_session_path, class: "text-sm font-medium text-gray-700 hover:text-blue-600" %>
           <%# link_to "Register", new_session_path, class: "bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition" %>

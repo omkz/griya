@@ -1,0 +1,15 @@
+<div class="max-w-7xl mx-auto px-4 py-16">
+  <div class="mb-8 flex justify-between items-center">
+    <h1 class="text-3xl font-black text-gray-900 italic">Preview Listing</h1>
+    <%= link_to "Kembali ke Dashboard", dashboard_properties_path, class: "text-blue-600 font-bold" %>
+  </div>
+
+  <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-xl">
+    <p class="text-gray-500 mb-8 italic text-balance">Anda sedang melihat preview internal untuk agen/admin. Untuk melihat tampilan publik, silakan klik tombol di bawah.</p>
+    
+    <div class="flex gap-4">
+      <%= link_to "Lihat Tampilan Publik", property_path(@property), class: "bg-blue-600 text-white px-6 py-3 rounded-xl font-bold" %>
+      <%= link_to "Edit Properti Ini", edit_dashboard_property_path(@property), class: "bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-bold" %>
+    </div>
+  </div>
+</div>

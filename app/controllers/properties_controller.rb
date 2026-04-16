@@ -24,7 +24,6 @@ class PropertiesController < ApplicationController
     @properties = @properties.order(created_at: :desc)
   end
 
-
   def show
     @property = Property.find(params[:id])
   end
