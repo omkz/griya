@@ -3,10 +3,6 @@ puts "Cleaning database..."
 Property.destroy_all
 Region.destroy_all
 User.destroy_all
-Account.destroy_all
-
-puts "Creating primary account..."
-account = Account.create!(name: "Griya Utama", subdomain: "griya")
 
 puts "Creating regions in Yogyakarta..."
 regions = [
@@ -16,15 +12,14 @@ regions = [
   { name: "Kulon Progo", center: "POINT(110.1500 -7.8500)" },
   { name: "Kota Yogyakarta", center: "POINT(110.3700 -7.8000)" }
 ].map do |r|
-  Region.create!(name: r[:name], country_code: "ID", center_point: r[:center])
+  Region.create!(name: r[:name], center_point: r[:center])
 end
 
 puts "Creating users..."
 admin = User.create!(
   email_address: "admin@griya.com",
   password: "password",
-  role: :admin,
-  account: account
+  role: :admin
 )
 
 agents = [
@@ -33,15 +28,14 @@ agents = [
   { email: "ari@griya.com", name: "Ari Wijaya" }
 ].map do |u|
   User.create!(
-    email_address: u[ :email],
+    email_address: u[:email],
     password: "password",
-    role: :agent,
-    account: account
+    role: :agent
   )
 end
 
 puts "Creating properties with detailed specs..."
-property_data = [
+[
   {
     title: "Rumah Mewah Modern Minimalis Sleman",
     description: "Hunian eksklusif dengan desain modern di lokasi strategis Sleman. Dekat dengan mall dan pusat bisnis. Lingkungan tenang dan aman dengan sistem one-gate.",
@@ -138,7 +132,7 @@ property_data = [
     street_address: "Kasongan, Bantul"
   }
 ].each do |p|
-  Property.create!(p.merge(account: account))
+  Property.create!(p)
 end
 
 puts "Seed completed! 🚀"

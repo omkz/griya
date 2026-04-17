@@ -5,5 +5,5 @@ class Region < ApplicationRecord
 
   has_many :properties
 
-  validates :name, :country_code, presence: true
+  validates :name, presence: true
 end

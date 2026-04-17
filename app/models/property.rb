@@ -1,6 +1,5 @@
 # app/models/property.rb
 class Property < ApplicationRecord
-  belongs_to :account
   belongs_to :user
   belongs_to :region
 

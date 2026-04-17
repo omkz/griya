@@ -4,7 +4,6 @@ class User < ApplicationRecord
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 
-  belongs_to :account
   has_many :properties, dependent: :destroy
 
   # Roles for your SaaS logic

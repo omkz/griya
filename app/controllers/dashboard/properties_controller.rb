@@ -17,7 +17,6 @@ module Dashboard
 
     def create
       @property = Property.new(property_params)
-      @property.account = Current.user.account
       @property.user = Current.user
 
       if @property.save
