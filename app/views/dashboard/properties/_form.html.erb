@@ -74,9 +74,11 @@
         </div>
       </div>
 
+      
       <!-- Media Section -->
-      <div class="p-8 bg-blue-50/50 rounded-[32px] border-2 border-dashed border-blue-200 flex flex-col items-center">
-        <%= f.label :images, class: "flex flex-col items-center cursor-pointer group" do %>
+      <div class="p-8 bg-blue-50/50 rounded-[32px] border-2 border-dashed border-blue-200 flex flex-col items-center"
+           data-controller="direct-upload">
+        <%= label_tag "images_picker", class: "flex flex-col items-center cursor-pointer group" do %>
           <div class="w-16 h-16 bg-blue-600 rounded-3xl flex items-center justify-center text-white mb-4 shadow-xl shadow-blue-200 transform group-hover:-translate-y-1 transition duration-300">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -84,23 +86,35 @@
           </div>
           <span class="text-blue-700 font-bold text-lg">Upload Foto Unit</span>
           <span class="text-xs text-blue-400 mt-1 uppercase tracking-widest font-bold">Maksimal 10 File .JPG/.PNG</span>
-          <%= f.file_field :images, multiple: true, accept: 'image/*', class: "hidden" %>
+          <%= file_field_tag "images_picker", 
+              multiple: true, 
+              accept: 'image/*', 
+              direct_upload: true,
+              class: "hidden",
+              data: { 
+                direct_upload_target: "input",
+                action: "change->direct-upload#handleFiles direct-upload:initialize->direct-upload#initializeDirectUpload" 
+              } %>
         <% end %>
 
-        <% if property.images.attached? %>
-          <div class="mt-8 grid grid-cols-4 gap-3 w-full">
+        <div class="mt-8 grid grid-cols-4 gap-3 w-full" data-direct-upload-target="preview">
+          <% if property.images.attached? %>
             <% property.images.each do |image| %>
-              <% if image.persisted? %>
-                <div class="aspect-square rounded-2xl overflow-hidden border-2 border-white shadow-md relative group">
-                  <%= image_tag image, class: "w-full h-full object-cover" %>
-                  <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                     <span class="text-white text-[10px] font-bold">Terlampir</span>
-                  </div>
+              <div class="aspect-square rounded-2xl overflow-hidden border <%= image.persisted? ? 'border-gray-200' : 'border-green-400' %> shadow-sm relative group">
+                <%= image_tag image, class: "w-full h-full object-cover" %>
+                
+                <%# Kirim ulang ID-nya agar tidak hilang saat submit berikutnya %>
+                <%= hidden_field_tag "property[images][]", image.signed_id %>
+                
+                <div class="absolute top-2 right-2">
+                  <span class="<%= image.persisted? ? 'bg-gray-900/40' : 'bg-green-600' %> text-white text-[8px] font-black px-2 py-1 rounded uppercase backdrop-blur-sm">
+                    <%= image.persisted? ? 'Saved' : 'Ready' %>
+                  </span>
                 </div>
-              <% end %>
+              </div>
             <% end %>
-          </div>
-        <% end %>
+          <% end %>
+        </div>
       </div>
 
       <!-- Map Location Helper -->
