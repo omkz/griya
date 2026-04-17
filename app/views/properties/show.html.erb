@@ -38,15 +38,54 @@
       </div>
 
       <h1 class="text-4xl font-extrabold text-gray-900 mb-2 italic"><%= @property.title %></h1>
-      <p class="text-xl text-gray-500 mb-6 flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <p class="text-gray-500 flex items-center gap-2 mb-8 font-medium">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
-        <%= @property.region.name %>, DI Yogyakarta
+        <%= @property.street_address.presence || "#{@property.region.name}, DI Yogyakarta" %>
       </p>
 
+      <div class="mb-10 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <% if @property.bedrooms > 0 %>
+          <div class="bg-blue-50/50 p-4 rounded-3xl border border-blue-100/50 flex flex-col items-center text-center">
+             <span class="text-2xl mb-1">🛏️</span>
+             <span class="text-sm font-black text-blue-900"><%= @property.bedrooms %> Kamar</span>
+          </div>
+        <% end %>
+        <% if @property.bathrooms > 0 %>
+          <div class="bg-blue-50/50 p-4 rounded-3xl border border-blue-100/50 flex flex-col items-center text-center">
+             <span class="text-2xl mb-1">🚿</span>
+             <span class="text-sm font-black text-blue-900"><%= @property.bathrooms %> Mandi</span>
+          </div>
+        <% end %>
+        <% if @property.building_area.present? %>
+          <div class="bg-blue-50/50 p-4 rounded-3xl border border-blue-100/50 flex flex-col items-center text-center">
+             <span class="text-2xl mb-1">🏠</span>
+             <span class="text-sm font-black text-blue-900"><%= @property.building_area %> m²</span>
+             <span class="text-[9px] text-blue-400 font-bold uppercase tracking-tighter">Luas Bangunan</span>
+          </div>
+        <% end %>
+        <% if @property.surface_area.present? %>
+          <div class="bg-blue-50/50 p-4 rounded-3xl border border-blue-100/50 flex flex-col items-center text-center">
+             <span class="text-2xl mb-1">📐</span>
+             <span class="text-sm font-black text-blue-900"><%= @property.surface_area %> m²</span>
+             <span class="text-[9px] text-blue-400 font-bold uppercase tracking-tighter">Luas Tanah</span>
+          </div>
+        <% end %>
+      </div>
+
       <div class="border-t border-b py-8 mb-8">
+        <div class="grid grid-cols-2 gap-8 mb-8">
+           <div>
+             <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Sertifikat</h4>
+             <p class="font-bold text-gray-900"><%= @property.certificate_type.presence || "N/A" %></p>
+           </div>
+           <div>
+             <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Lantai</h4>
+             <p class="font-bold text-gray-900"><%= @property.floors %> Lantai</p>
+           </div>
+        </div>
+        
         <h3 class="text-2xl font-bold mb-4">Deskripsi</h3>
         <div class="prose prose-blue max-w-none text-gray-700 leading-relaxed mb-8">
           <%= simple_format @property.description %>

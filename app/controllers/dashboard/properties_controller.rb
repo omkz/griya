@@ -62,7 +62,7 @@ module Dashboard
     end
 
     def property_params
-      params.require(:property).permit(:title, :description, :price, :listing_type, :property_type, :status, :region_id, :lonlat, :featured, images: [])
+      params.require(:property).permit(:title, :description, :price, :listing_type, :property_type, :status, :region_id, :lonlat, :featured, :bedrooms, :bathrooms, :building_area, :surface_area, :floors, :certificate_type, :street_address, images: [])
     end
   end
 end

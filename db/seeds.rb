@@ -1,84 +1,145 @@
-# Reset Data
+# Resetting database
 puts "Cleaning database..."
 Property.destroy_all
-User.destroy_all
 Region.destroy_all
+User.destroy_all
 Account.destroy_all
 
-# Core Account
-acc = Account.create!(name: "Griya Jogja", subdomain: "jogja")
+puts "Creating primary account..."
+account = Account.create!(name: "Griya Utama", subdomain: "griya")
 
-# Users
-puts "Creating users..."
-admin = User.create!(email_address: "admin@griya.com", password: "password123", account: acc, role: :admin)
-agent1 = User.create!(email_address: "agent_jogja@griya.com", password: "password123", account: acc, role: :agent)
-agent2 = User.create!(email_address: "agent_bantul@griya.com", password: "password123", account: acc, role: :agent)
-agent3 = User.create!(email_address: "agent_sleman@griya.com", password: "password123", account: acc, role: :agent)
-
-agents = [agent1, agent2, agent3]
-
-# Regions
+puts "Creating regions in Yogyakarta..."
 regions = [
-  Region.create!(name: "Bangunjiwo", country_code: "ID"),
-  Region.create!(name: "Kasihan", country_code: "ID"),
-  Region.create!(name: "Sewon", country_code: "ID"),
-  Region.create!(name: "Bantul Kota", country_code: "ID"),
-  Region.create!(name: "Sleman", country_code: "ID"),
-  Region.create!(name: "Godean", country_code: "ID"),
-  Region.create!(name: "Mlati", country_code: "ID")
-]
+  { name: "Sleman", center: "POINT(110.3800 -7.7100)" },
+  { name: "Bantul", center: "POINT(110.3300 -7.8900)" },
+  { name: "Gunung Kidul", center: "POINT(110.6000 -7.9900)" },
+  { name: "Kulon Progo", center: "POINT(110.1500 -7.8500)" },
+  { name: "Kota Yogyakarta", center: "POINT(110.3700 -7.8000)" }
+].map do |r|
+  Region.create!(name: r[:name], country_code: "ID", center_point: r[:center])
+end
 
-titles = [
-  "Rumah Minimalis Modern", "Tanah Kavling Murah", "Apartemen Eksklusif", 
-  "Griya Asri Bangunjiwo", "Hunian Nyaman Keluarga", "Ruko Strategis",
-  "Pekarangan Luas Shm", "Rumah Industrial 2 Lantai", "Tanah Tepi Jalan",
-  "Vila View Sawah", "Kost Eksklusif Dekat UMY", "Cluster Bangunjiwo Permai",
-  "Rumah Heritage Kotagede", "Tanah Pekarangan Matang", "Condo Mewah Ringroad"
-]
+puts "Creating users..."
+admin = User.create!(
+  email_address: "admin@griya.com",
+  password: "password",
+  role: :admin,
+  account: account
+)
 
-descriptions = [
-  "Lokasi sangat strategis dekat dengan pusat pendidikan. Lingkungan aman dan asri.",
-  "Sudah pecah SHM, siap bangun. Akses jalan aspal luas bisa simpangan mobil.",
-  "Konsep hunian modern dengan pencahayaan alami maksimal. Bebas banjir.",
-  "Investasi menjanjikan di Jogja Selatan. Dekat dengan rencana gate tol.",
-  "Bangunan kokoh, material berkualitas tinggi, desain kekinian.",
-  "Dekat masjid, pasar, dan fasilitas kesehatan. Akses kendaraan mudah."
-]
-
-puts "Seeding 30 properties..."
-
-30.times do |i|
-  type = Property.property_types.keys.sample
-  l_type = Property.listing_types.keys.sample
-  
-  base_price = case type
-               when "house" then rand(450..2500) * 1_000_000
-               when "land" then rand(150..3000) * 1_000_000
-               when "apartment" then rand(350..1500) * 1_000_000
-               else rand(800..5000) * 1_000_000
-               end
-
-  Property.create!(
-    account: acc,
-    user: (i < 5 ? admin : agents.sample), # Admin owns 5, others distributed
-    region: regions.sample,
-    title: "#{titles.sample} #{i+1}",
-    description: descriptions.sample,
-    price: base_price,
-    listing_type: l_type,
-    property_type: type,
-    status: :active,
-    featured: (i < 6), # First 6 are featured
-    views_count: rand(10..1000),
-    lonlat: "POINT(#{110.3 + rand(0.01..0.08)} #{-7.8 - rand(0.01..0.08)})"
+agents = [
+  { email: "budi@griya.com", name: "Budi Santoso" },
+  { email: "siti@griya.com", name: "Siti Aminah" },
+  { email: "ari@griya.com", name: "Ari Wijaya" }
+].map do |u|
+  User.create!(
+    email_address: u[ :email],
+    password: "password",
+    role: :agent,
+    account: account
   )
 end
 
-puts "--- SEED SUMMARY ---"
-puts "Users: #{User.count} (1 Admin, 3 Agents)"
-puts "Properties: #{Property.count}"
-puts "Featured: #{Property.where(featured: true).count}"
-puts "Agent Jogja Listings: #{agent1.properties.count}"
-puts "Agent Bantul Listings: #{agent2.properties.count}"
-puts "Agent Sleman Listings: #{agent3.properties.count}"
-puts "--------------------"
+puts "Creating properties with detailed specs..."
+property_data = [
+  {
+    title: "Rumah Mewah Modern Minimalis Sleman",
+    description: "Hunian eksklusif dengan desain modern di lokasi strategis Sleman. Dekat dengan mall dan pusat bisnis. Lingkungan tenang dan aman dengan sistem one-gate.",
+    price: 1500000000,
+    listing_type: :for_sale,
+    property_type: :house,
+    status: :active,
+    region: regions[0], # Sleman
+    user: agents[0],
+    lonlat: "POINT(110.3644 -7.7472)",
+    featured: true,
+    bedrooms: 4,
+    bathrooms: 3,
+    building_area: 200,
+    surface_area: 150,
+    floors: 2,
+    certificate_type: "SHM",
+    street_address: "Jl. Kaliurang KM 10, Sleman"
+  },
+  {
+    title: "Tanah Murah Dekat Bantul City",
+    description: "Tanah kavling siap bangun. Lokasi sangat berkembang, cocok untuk investasi masa depan atau hunian asri. Akses jalan aspal lebar.",
+    price: 350000000,
+    listing_type: :for_sale,
+    property_type: :land,
+    status: :active,
+    region: regions[1], # Bantul
+    user: agents[1],
+    lonlat: "POINT(110.3125 -7.8890)",
+    featured: false,
+    bedrooms: 0,
+    bathrooms: 0,
+    building_area: 0,
+    surface_area: 250,
+    floors: 0,
+    certificate_type: "SHM",
+    street_address: "Jl. Bantul KM 5, Sewon"
+  },
+  {
+    title: "Apartemen Studio City View Yogyakarta",
+    description: "Apartemen mewah dengan fasilitas lengkap: kolam renang, gym, dan keamanan 24 jam. View kota yang indah di malam hari. Investasi menarik untuk sewa.",
+    price: 550000000,
+    listing_type: :for_sale,
+    property_type: :apartment,
+    status: :active,
+    region: regions[4], # Kota
+    user: agents[2],
+    lonlat: "POINT(110.3705 -7.7810)",
+    featured: true,
+    bedrooms: 1,
+    bathrooms: 1,
+    building_area: 36,
+    surface_area: 36,
+    floors: 1,
+    certificate_type: "HGB",
+    street_address: "Jl. Laksda Adisucipto"
+  },
+  {
+    title: "Ruko Strategis di Pusat Kota Jogja",
+    description: "Ruko 3 lantai sangat luas. Lokasi prime di pinggir jalan utama. Cocok untuk kantor, bank, atau showroom bisnis Anda.",
+    price: 25000000,
+    listing_type: :for_rent,
+    property_type: :commercial,
+    status: :active,
+    region: regions[4], # Kota
+    user: agents[0],
+    lonlat: "POINT(110.3650 -7.7940)",
+    featured: false,
+    bedrooms: 0,
+    bathrooms: 2,
+    building_area: 150,
+    surface_area: 100,
+    floors: 3,
+    certificate_type: "HGB",
+    street_address: "Jl. Malioboro No. 45"
+  },
+  {
+    title: "Rumah Klasik Jawa Estetik Bantul",
+    description: "Rumah dengan sentuhan gaya Joglo modern. Udara bersih dan jauh dari kebisingan kota. Interior menggunakan kayu jati pilihan.",
+    price: 1200000000,
+    listing_type: :for_sale,
+    property_type: :house,
+    status: :active,
+    region: regions[1], # Bantul
+    user: agents[1],
+    lonlat: "POINT(110.3245 -7.8456)",
+    featured: true,
+    bedrooms: 3,
+    bathrooms: 2,
+    building_area: 180,
+    surface_area: 300,
+    floors: 1,
+    certificate_type: "SHM",
+    street_address: "Kasongan, Bantul"
+  }
+].each do |p|
+  Property.create!(p.merge(account: account))
+end
+
+puts "Seed completed! 🚀"
+puts "Users: admin@griya.com, budi@griya.com, siti@griya.com, ari@griya.com (pass: password)"
