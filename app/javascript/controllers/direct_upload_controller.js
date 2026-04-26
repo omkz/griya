@@ -4,12 +4,81 @@ import { DirectUpload } from "@rails/activestorage"
 export default class extends Controller {
     static targets = ["input", "preview"]
 
-    handleFiles(event) {
+    async handleFiles(event) {
         const files = Array.from(event.target.files)
-        files.forEach(file => this.uploadFile(file))
 
-        // Clear the input so the same files can be selected again if needed
-        // event.target.value = null
+        // Reset the input so it can be used again for the same files
+        event.target.value = null
+
+        for (const file of files) {
+            if (!file.type.startsWith('image/')) {
+                this.uploadFile(file)
+                continue
+            }
+
+            // Automagically compress images before upload for premium UX
+            try {
+                const compressedFile = await this.compressImage(file)
+                this.uploadFile(compressedFile)
+            } catch (error) {
+                console.error("Compression failed, uploading original:", error)
+                this.uploadFile(file)
+            }
+        }
+    }
+
+    // Client-side image compression logic
+    compressImage(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader()
+            reader.readAsDataURL(file)
+            reader.onload = (event) => {
+                const img = new Image()
+                img.src = event.target.result
+                img.onload = () => {
+                    const canvas = document.createElement('canvas')
+                    const MAX_WIDTH = 2500 // Maximum resolution for real estate photos
+                    const MAX_HEIGHT = 2000
+                    let width = img.width
+                    let height = img.height
+
+                    // Calculate new dimensions maintainting aspect ratio
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width
+                            width = MAX_WIDTH
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height
+                            height = MAX_HEIGHT
+                        }
+                    }
+
+                    canvas.width = width
+                    canvas.height = height
+                    const ctx = canvas.getContext('2d')
+
+                    // High quality interpolation
+                    ctx.drawImage(img, 0, 0, width, height)
+
+                    canvas.toBlob((blob) => {
+                        if (!blob) {
+                            reject(new Error("Canvas toBlob failed"))
+                            return
+                        }
+                        // Create a new File object from the compressed blob
+                        const compressedFile = new File([blob], file.name, {
+                            type: 'image/jpeg',
+                            lastModified: Date.now()
+                        })
+                        resolve(compressedFile)
+                    }, 'image/jpeg', 0.85) // 85% quality is the sweet spot
+                }
+                img.onerror = reject
+            }
+            reader.onerror = reject
+        })
     }
 
     uploadFile(file) {
@@ -18,7 +87,6 @@ export default class extends Controller {
 
         const url = this.inputTarget.getAttribute("data-direct-upload-url")
 
-        // Create delegate to handle progress for THIS specific file
         const delegate = {
             directUploadWillStoreFileWithXHR: (request) => {
                 request.upload.addEventListener("progress", event => {
@@ -64,8 +132,11 @@ export default class extends Controller {
         const container = document.getElementById(`preview-${tempId}`)
         if (container) {
             container.classList.add("border-red-500")
-            container.querySelector('.upload-badge').innerHTML = "Error"
-            container.querySelector('.upload-badge').className = "upload-badge bg-red-600 text-white text-[8px] font-black px-2 py-1 rounded uppercase"
+            const badge = container.querySelector('.upload-badge')
+            if (badge) {
+                badge.innerHTML = "Error"
+                badge.className = "upload-badge bg-red-600 text-white text-[8px] font-black px-2 py-1 rounded uppercase"
+            }
             console.error(error)
         }
     }
@@ -75,8 +146,11 @@ export default class extends Controller {
         if (container) {
             container.classList.remove("animate-pulse", "border-blue-400")
             container.classList.add("border-green-400")
-            container.querySelector('.upload-badge').innerHTML = "Ready"
-            container.querySelector('.upload-badge').className = "upload-badge bg-green-500 text-white text-[8px] font-black px-2 py-1 rounded uppercase"
+            const badge = container.querySelector('.upload-badge')
+            if (badge) {
+                badge.innerHTML = "Ready"
+                badge.className = "upload-badge bg-green-500 text-white text-[8px] font-black px-2 py-1 rounded uppercase"
+            }
 
             const hiddenField = document.createElement("input")
             hiddenField.type = "hidden"
