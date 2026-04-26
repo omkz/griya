@@ -4,7 +4,11 @@ class Property < ApplicationRecord
   belongs_to :region
 
   # Active Storage for photos and legal docs
-  has_many_attached :images
+  has_many_attached :images do |attachable|
+    attachable.variant :large, resize_to_limit: [1200, 800], format: :webp
+    attachable.variant :card, resize_to_limit: [600, 400], format: :webp
+    attachable.variant :thumbnail, resize_to_limit: [200, 200], format: :webp
+  end
   has_one_attached :certificate
 
   enum :property_type, { house: 0, land: 1, apartment: 2, commercial: 3 }

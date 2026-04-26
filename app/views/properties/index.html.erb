@@ -70,7 +70,9 @@
             <%= link_to property_path(property), class: "group bg-white border border-gray-100 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300" do %>
               <div class="relative h-56 bg-gray-200 overflow-hidden text-balance">
                 <% if property.images.attached? %>
-                  <%= image_tag property.images.first, class: "w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" %>
+                  <%= image_tag property.images.first.variant(:card), 
+                      class: "w-full h-full object-cover group-hover:scale-105 transition-transform duration-500",
+                      loading: "lazy" %>
                 <% else %>
                   <div class="w-full h-full flex items-center justify-center text-gray-400 font-bold bg-gray-100">NO IMAGE</div>
                 <% end %>
