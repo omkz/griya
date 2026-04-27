@@ -5,9 +5,9 @@ class Property < ApplicationRecord
 
   # Active Storage attachments
   has_many_attached :images do |attachable|
-    attachable.variant :large, resize_to_limit: [1200, 800], format: :webp
-    attachable.variant :card, resize_to_limit: [600, 400], format: :webp
-    attachable.variant :thumbnail, resize_to_limit: [200, 200], format: :webp
+    attachable.variant :large, resize_to_limit: [ 1200, 800 ], format: :webp
+    attachable.variant :card, resize_to_limit: [ 600, 400 ], format: :webp
+    attachable.variant :thumbnail, resize_to_limit: [ 200, 200 ], format: :webp
   end
   has_one_attached :certificate
 
@@ -17,12 +17,12 @@ class Property < ApplicationRecord
 
   # Standard validations
   validates :title, :price, :lonlat, presence: true
-  
+
   # Image validations (requires active_storage_validations gem)
-  validates :images, 
-    content_type: [:png, :jpg, :jpeg, :webp], 
-    size: { less_than: 5.megabytes , message: 'is too large (max 5MB per photo)' },
-    limit: { min: 1, max: 15, message: 'must have between 1 and 15 photos' }
+  validates :images,
+    content_type: [ :png, :jpg, :jpeg, :webp ],
+    size: { less_than: 5.megabytes, message: "is too large (max 5MB per photo)" },
+    limit: { min: 1, max: 15, message: "must have between 1 and 15 photos" }
 
   # Callbacks to trigger background processing
   after_commit :precompute_variants, if: -> { images.attached? }

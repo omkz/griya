@@ -7,7 +7,7 @@ module Dashboard
       else
         @properties = Current.user.properties
       end
-      
+
       @properties = @properties.order(created_at: :desc)
     end
 
@@ -20,7 +20,7 @@ module Dashboard
       @property.user = Current.user
 
       if @property.save
-        redirect_to [:dashboard, @property], notice: "Properti berhasil ditambahkan!"
+        redirect_to [ :dashboard, @property ], notice: "Properti berhasil ditambahkan!"
       else
         render :new, status: :unprocessable_entity
       end
@@ -33,7 +33,7 @@ module Dashboard
     def update
       @property = find_property
       if @property.update(property_params)
-        redirect_to [:dashboard, @property], notice: "Properti berhasil diperbarui!"
+        redirect_to [ :dashboard, @property ], notice: "Properti berhasil diperbarui!"
       else
         render :edit, status: :unprocessable_entity
       end

@@ -5,7 +5,7 @@ class PropertyImageJob < ApplicationJob
   def perform(property)
     property.images.each do |image|
       # Trigger processing for each named variant
-      [:large, :card, :thumbnail].each do |variant_name|
+      [ :large, :card, :thumbnail ].each do |variant_name|
         image.variant(variant_name).processed
       end
     end

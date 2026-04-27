@@ -1,5 +1,5 @@
 class PropertiesController < ApplicationController
-  allow_unauthenticated_access only: [:index, :show]
+  allow_unauthenticated_access only: [ :index, :show ]
 
   def index
     @properties = Property.where(status: :active)
@@ -13,7 +13,7 @@ class PropertiesController < ApplicationController
 
     # Filter by type
     @properties = @properties.where(property_type: params[:type]) if params[:type].present?
-    
+
     # Filter by listing type
     @properties = @properties.where(listing_type: params[:listing_type]) if params[:listing_type].present?
 

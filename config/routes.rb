@@ -1,8 +1,8 @@
 Rails.application.routes.draw do
   resource :session
   resources :passwords, param: :token
-  resources :properties, only: [:index, :show]
-  
+  resources :properties, only: [ :index, :show ]
+
   namespace :dashboard do
     root to: "properties#index"
     resources :properties
